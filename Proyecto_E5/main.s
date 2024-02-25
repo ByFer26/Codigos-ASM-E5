@@ -1,0 +1,727 @@
+;Proyecto final E5 sección C grupo 2
+;Integrantes
+;Pablo Sebastian Juárez Montufar  201902657
+;Byron Fernando Montenegro Lucero 201901668
+;Gerson Santiago Conchas Jiménez 201903111
+;//////////////////Inicio//////////////////////////////
+RCGCGPIO     	EQU 0X400FE608
+;Constantes del Puerto A
+GPIODATAA		EQU 0X400043FC
+GPIODIRA		EQU 0X40004400
+GPIOAFSELA		EQU 0X40004420
+GPIODENA		EQU 0X4000451C
+PORTA			EQU 0X01
+PINA			EQU 0X3C
+;Constantes del Puerto B
+RCGC0				EQU	0x400FE100
+RCGC2				EQU	0x400FE108
+GPIODEN				EQU	0x4000551C
+GPIOAFSEL			EQU	0x40005420
+GPIOPCTL			EQU 0x4000552C
+RCC					EQU 0x400FE060
+PWM0CTL				EQU 0x40028040
+PWM0GENA			EQU 0x40028060
+PWM0LOAD			EQU 0x40028050
+PWM0CMPA			EQU 0x40028058
+PWMENABLE			EQU 0x40028008
+;Constantes del Puerto C
+GPIODIRC		EQU 0X40006400
+GPIODATAC		EQU 0X400063C0 
+GPIOAFSELC  	EQU 0X40006420
+GPIODENC    	EQU 0X4000651C
+PORTC			EQU 0x04
+PINC 			EQU 0XF0
+;Constantes del Puerto D
+GPIODIRD     	EQU 0X40007400
+GPIOAFSELD   	EQU 0X40007420
+GPIODEND     	EQU 0X4000751C
+GPIODATAD    	EQU 0X40007338
+PORTD        	EQU 0X08
+PIND         	EQU 0XCF
+;Constantes Puerto E
+GPIOAFSELE   	EQU 0X40024420
+GPIODIRE     	EQU 0X40024400
+GPIODENE     	EQU 0X4002451C
+GPIODATAE    	EQU 0x400240FC
+PORTE        	EQU 0X10
+PINE         	EQU 0XF8
+	
+;Constantes para el Puerto F
+GPIOAFSELF   	EQU 0X40025420
+GPIODIRF     	EQU 0X40025400
+GPIODENF     	EQU 0X4002551C
+GPIODATAF    	EQU 0x4002507C
+PORTF        	EQU 0X20
+PINF         	EQU 0X1F
+
+;Constantes para los delays
+segundo      EQU 4000000
+csegundo	 EQU 20000000
+vsegundo	 EQU 80000000
+dsegundo	 EQU 40000000
+	
+		AREA	|.text|, CODE, READONLY, ALIGN=2
+		THUMB
+		EXPORT Start
+			
+Clock_Init
+	LDR  R1,=RCGCGPIO 
+	LDR  R0,[R1]
+	ORR  R0,R0,#0x3D
+	STR  R0,[R1]
+	BX	LR
+	
+PORTA_Init 
+	LDR R1,=GPIODIRA
+	LDR R0,[R1]
+	ORR R0,R0,#0XFF
+	STR R0,[R1]
+	
+	LDR R1,=GPIOAFSELA 
+	LDR R0,[R1]
+	ORR R0,R0,#0X00000000
+	STR R0,[R1]
+	
+	LDR R1,=GPIODENA 
+	LDR R0,[R1]
+	ORR R0,R0,#0XFF
+	STR R0,[R1]
+	BX	LR
+	
+PWM_Init
+	LDR		R1, =RCGC0			
+	MOV		R0, #0x00100000	
+	STR		R0, [R1]			
+	LDR		R1, =RCGC2			
+	LDR		R0, [R1]		
+	ORR		R0, R0, #0x00000002	
+	STR		R0, [R1]			
+	NOP
+	LDR		R1, =GPIODEN	
+	MOV		R0, #0x000000C0
+	STR		R0, [R1]
+	LDR		R1, =GPIOAFSEL		
+	LDR		R0, [R1]
+	MOV		R0, #0x000000C0
+	STR		R0, [R1]
+	LDR		R1, =GPIOPCTL		
+	LDR		R0, [R1]
+	MOV		R0, #0x04000000
+	STR		R0, [R1]
+	BX		LR
+PORTC_Init 
+	LDR R1,=GPIODIRC
+	LDR R0,[R1]
+	ORR R0,R0,#PINC
+	STR R0,[R1]
+	
+	LDR R1,=GPIOAFSELC 
+	LDR R0,[R1]
+	ORR R0,R0,#0X00000000
+	STR R0,[R1]
+	
+	LDR R1,=GPIODENC 
+	LDR R0,[R1]
+	ORR R0,R0,#0XFF
+	STR R0,[R1]
+	BX	LR
+	
+PORTD_Init
+	LDR R1,=GPIODIRD 
+	LDR R0,[R1]
+	ORR R0,R0,#0XFF
+	STR R0,[R1]
+	
+	LDR R1,=GPIOAFSELD 
+	LDR R0,[R1]
+	ORR R0,R0,#0X00000000
+	STR R0,[R1]
+	
+	LDR R1,=GPIODEND 
+	LDR R0,[R1]
+	ORR R0,R0,#0XFF
+	STR R0,[R1]
+	BX	LR
+	
+PORTE_Init
+	LDR R1,=GPIODIRE
+	LDR R0,[R1]
+	ORR R0,R0,#0X00
+	STR R0,[R1]
+	
+	LDR R1,=GPIOAFSELE
+	LDR R0,[R1]
+	ORR R0,R0,#0X00000000
+	STR R0,[R1]
+	
+	LDR R1,=GPIODENE
+	LDR R0,[R1]
+	ORR R0,R0,#0xFF
+	STR R0,[R1]
+	BX LR
+
+PORTF_Init
+	LDR R1,=GPIODIRF
+	LDR R0,[R1]
+	ORR R0,R0,#0XFF
+	STR R0,[R1]
+	
+	LDR R1,=GPIOAFSELF
+	LDR R0,[R1]
+	ORR R0,R0,#0X00000000
+	STR R0,[R1]
+	
+	LDR R1,=GPIODENF
+	LDR R0,[R1]
+	ORR R0,R0,#0xFF
+	STR R0,[R1]
+	BX LR
+delay
+		LDR R1,=segundo
+del
+	SUBS R1,R1,#1
+	BNE del
+	BX LR
+
+
+cdelay
+		LDR R1,=csegundo
+cdel
+	SUBS R1,R1,#1
+	BNE cdel
+	BX LR
+
+	
+ddelay
+		LDR R1,=dsegundo
+ddel
+	SUBS R1,R1,#1
+	BNE ddel
+	BX LR	
+vdelay
+		LDR R1,=vsegundo
+vdel
+	SUBS R1,R1,#1
+	BNE vdel
+	BX LR
+Apertura
+	LDR		R1, =RCC		
+	LDR		R0, [R1]
+	LDR		R0, =0x07903AD1
+	STR		R0, [R1]
+	LDR		R1, =PWM0CTL			
+	MOV		R0, #0x00000002
+	STR		R0, [R1]
+	LDR		R1, =PWM0GENA			
+	MOV		R0, #0x000000C2
+	STR		R0, [R1]
+	LDR		R1, =PWM0LOAD		
+	LDR		R0, =0x00027100
+	STR		R0, [R1]
+	LDR		R1, =PWM0CMPA			
+	LDR		R0, =0x00003E80
+	STR		R0, [R1]
+	LDR		R1, =PWM0CTL			
+	MOV		R0, #0x000000003
+	STR		R0, [R1]
+	LDR		R1, =PWMENABLE			
+	MOV		R0, #0x00000001	
+	STR		R0, [R1]
+	BX		LR	
+	
+Cerrar
+	LDR		R1, =RCC		
+	LDR		R0, [R1]
+	LDR		R0, =0x07903AD1
+	STR		R0, [R1]
+	LDR		R1, =PWM0CTL			
+	MOV		R0, #0x00000002
+	STR		R0, [R1]
+	LDR		R1, =PWM0GENA			
+	MOV		R0, #0x000000C2
+	STR		R0, [R1]
+	LDR		R1, =PWM0LOAD		
+	LDR		R0, =0x00025990
+	STR		R0, [R1]
+	LDR		R1, =PWM0CMPA			
+	LDR		R0, =0x00000FA0
+	STR		R0, [R1]
+	LDR		R1, =PWM0CTL			
+	MOV		R0, #0x000000003
+	STR		R0, [R1]
+	LDR		R1, =PWMENABLE			
+	MOV		R0, #0x00000001	
+	STR		R0, [R1]
+	BX		LR	
+AbrirServo1
+	LDR		R10,=0X40004300
+	LDR		R11,[R10]
+	MOV		R11,#0X40
+	STR		R11,[R10]
+	BX		LR	
+	
+AbrirServo2
+	LDR		R10,=0X40004300
+	LDR		R11,[R10]
+	MOV		R11,#0X80
+	STR		R11,[R10]
+	BX		LR	
+	
+CerrarServo2
+	LDR		R10,=0X40004300
+	LDR		R11,[R10]
+	MOV		R11,#0X00
+	STR		R11,[R10]
+	BX		LR	
+Start 
+	BL	PWM_Init
+	BL 	Clock_Init
+	BL	PORTA_Init
+	BL	PORTC_Init
+	BL 	PORTD_Init
+	BL	PORTE_Init
+	BL	PORTF_Init
+	MOV R2,#0X00
+	MOV	R6,#0X00
+Loop
+	LDR R0,=GPIODATAE
+	LDR R1,[R0]
+	CMP R1,#0X01
+	BEQ Conteo_latas
+	CMP	R1,#0X02
+	BEQ cobro_latas
+	CMP R1,#0X04
+	BEQ trituracion_latas
+	CMP R1,#0X08
+	BEQ Conteo_botellas
+	CMP R1,#0X10
+	BEQ cobro_botellas
+	CMP R1,#0X20
+	BEQ.W trituracion_botellas
+	B	Loop
+Conteo_latas
+	BL	delay
+	ADD R2,R2,#0X01
+	CMP	R2,#0X00
+	BEQ.W	latas0
+	CMP	R2,#0X01
+	BEQ.W	latas1
+	CMP	R2,#0X02
+	BEQ.W	latas2
+	CMP	R2,#0X03
+	BEQ.W	latas3
+	CMP	R2,#0X04
+	BEQ.W	latas4
+	CMP	R2,#0X05
+	BEQ.W	latas5
+	CMP	R2,#0X06
+	BEQ.W	latas6
+	CMP	R2,#0X07
+	BEQ.W	latas7
+	CMP	R2,#0X08
+	BEQ.W	latas8
+	CMP	R2,#0X09
+	BEQ.W	latas9
+	CMP	R2,#0X0A
+	BEQ.W 	latas10
+	B	Loop
+Conteo_botellas
+	BL	delay
+	ADD R6,R6,#0X01
+	CMP	R6,#0X00
+	BEQ.W	botellas0
+	CMP	R6,#0X01
+	BEQ.W	botellas1
+	CMP	R6,#0X02
+	BEQ.W	botellas2
+	CMP	R6,#0X03
+	BEQ.W	botellas3
+	CMP	R6,#0X04
+	BEQ.W	botellas4
+	CMP	R6,#0X05
+	BEQ.W	botellas5
+	CMP	R6,#0X06
+	BEQ.W	botellas6
+	CMP	R6,#0X07
+	BEQ.W	botellas7
+	CMP	R6,#0X08
+	BEQ.W	botellas8
+	CMP	R6,#0X09
+	BEQ.W	botellas9
+	CMP	R6,#0X0A
+	BEQ.W 	botellas10
+	B	Loop
+cobro_latas
+	BL	cdelay
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X80
+	STR R5,[R4]
+	MOV	R2,#0X0A
+	B	Loop
+cobro_botellas
+	BL	cdelay
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X20
+	STR R9,[R8]
+	MOV	R6,#0X0A
+	B	Loop
+trituracion_latas
+	BL	vdelay
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X00
+	STR R5,[R4]
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X00
+	STR R5,[R3]
+	MOV	R2,#0X00
+	B	Loop
+trituracion_botellas
+	BL	ddelay
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X00
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X00
+	STR R9,[R7]
+	MOV	R6,#0X00
+	B	Loop
+latas0
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X00
+	STR R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X00
+	STR R5,[R4]
+	B	Loop
+latas1
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X02
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X10
+	STR R5,[R4]
+	B	Loop
+	LTORG
+latas2
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X04
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X10
+	STR R5,[R4]
+	B	Loop
+latas3
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X06
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X20
+	STR R5,[R4]
+	B	Loop
+latas4
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X08
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X20
+	STR R5,[R4]
+	B	Loop
+latas5
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X0A
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X20
+	STR R5,[R4]
+	B	Loop
+latas6
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X0C
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X40
+	STR R5,[R4]
+	B	Loop
+latas7
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X0E
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X40
+	STR R5,[R4]
+	B	Loop
+latas8
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X40
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X40
+	STR R5,[R4]
+	B	Loop
+latas9
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X42
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0X40
+	STR R5,[R4]
+	B	Loop
+latas10
+	BL	AbrirServo1
+	BL	delay
+	BL	Apertura
+	BL	cdelay
+	BL	Cerrar
+	LDR R3,=GPIODATAD
+	LDR	R5,[R3]
+	MOV R5,#0X80
+	STR	R5,[R3]
+	LDR	R4,=GPIODATAC
+	LDR	R5,[R4]
+	MOV	R5,#0XC0
+	STR R5,[R4]
+	B	Loop
+botellas0
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X00
+	STR	R9,[R7]
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X00
+	STR R9,[R8]
+	B	Loop
+botellas1
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X084
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X10
+	STR	R9,[R7]
+	B	Loop
+botellas2
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X084
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X02
+	STR	R9,[R7]
+	B	Loop
+botellas3
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X88
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X12
+	STR	R9,[R7]
+	B	Loop
+botellas4
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X88
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X04
+	STR	R9,[R7]
+	B	Loop
+botellas5
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X88
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X14
+	STR	R9,[R7]
+	B	Loop
+botellas6
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X90
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X06
+	STR	R9,[R7]
+	B	Loop
+botellas7
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X90
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X16
+	STR	R9,[R7]
+	B	Loop
+botellas8
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X90
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X08
+	STR	R9,[R7]
+	B	Loop
+botellas9
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0X90
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X18
+	STR	R9,[R7]
+	B	Loop
+botellas10
+	BL	AbrirServo2
+	BL	delay
+	BL	Cerrar
+	BL	cdelay
+	BL	Apertura
+	BL	CerrarServo2
+	LDR	R8,=GPIODATAA
+	LDR	R9,[R8]
+	MOV	R9,#0Xb0
+	STR R9,[R8]
+	LDR R7,=GPIODATAF
+	LDR	R9,[R7]
+	MOV R9,#0X01
+	STR	R9,[R7]
+	B	Loop
+	
+	ALIGN
+	END

@@ -1,0 +1,265 @@
+		AREA	|.text|, CODE, READONLY, ALIGN=2
+		THUMB
+		EXPORT Start
+			
+Start
+;-------------------Ingreso de los numeros--------
+	VLDR.F32	S0,=10
+	VLDR.F32	S1,=26
+	VLDR.F32	S2,=22
+	VLDR.F32	S3,=2
+;---------------Constantes---------
+	VLDR.F32		S4,=1
+	VLDR.F32		S20,=1
+
+orden
+	VSUB.F32	S5,S0,S1
+	VABS.F32	S6,S5
+	VDIV.F32	S7,S5,S6
+	VCMP.F32	S7,S4
+	VMRS APSR_nzcv,FPSCR
+	BEQ.W			mayor1
+	
+	VSUB.F32	S5,S1,S2
+	VABS.F32	S6,S5
+	VDIV.F32	S7,S5,S6
+	VCMP.F32	S7,S4
+	VMRS APSR_nzcv,FPSCR
+	BEQ.W			mayor2
+	
+	VSUB.F32	S5,S2,S3
+	VABS.F32	S6,S5
+	VDIV.F32	S7,S5,S6
+	VCMP.F32	S7,S4
+	VMRS APSR_nzcv,FPSCR
+	BEQ.W			mayor3
+	
+
+	B	mcm
+	
+mayor1	
+	VMOV.F32	S8,S0
+	VMOV.F32	S9,S1
+	VMOV.F32	S0,S9
+	VMOV.F32	S1,S8
+	B	orden
+	
+mayor2	
+	VMOV.F32	S8,S1
+	VMOV.F32	S9,S2
+	VMOV.F32	S1,S9
+	VMOV.F32	S2,S8
+	B	orden
+	
+mayor3	
+	VMOV.F32	S8,S2
+	VMOV.F32	S9,S3
+	VMOV.F32	S2,S9
+	VMOV.F32	S3,S8
+	B	orden
+	
+mcm
+	VDIV.F32	S5,S0,S0
+	VDIV.F32	S6,S1,S0
+	VDIV.F32	S7,S2,S0
+	VDIV.F32	S8,S3,S0
+primero
+	BL			div1
+	VADD.F32	S20,S20,S4
+	VCMP.F32	S20,S6
+	VMRS APSR_nzcv,FPSCR
+	BEQ			exacto1
+	VMOV.F32	S6,S1
+segundo
+	BL			div2
+	VADD.F32	S20,S20,S4
+	VCMP.F32	S20,S7
+	VMRS APSR_nzcv,FPSCR
+	BEQ			exacto2
+	VMOV.F32	S7,S2
+tercero
+	BL			div3
+	VADD.F32	S20,S20,S4
+	VCMP.F32	S20,S8
+	VMRS APSR_nzcv,FPSCR
+	BEQ			exacto3
+	VMOV.F32	S8,S3
+	B			orden2
+	
+div1
+	VMUL.F32	S9,S20,S0
+	VSUB.F32	S10,S1,S9
+	VCMP.F32	S10,S0
+	VMRS APSR_nzcv,FPSCR
+	BLE			regreso1
+	VADD.F32	S20,S20,S4
+	B			div1
+	
+div2
+	VMUL.F32	S9,S20,S0
+	VSUB.F32	S10,S2,S9
+	VCMP.F32	S10,S0
+	VMRS APSR_nzcv,FPSCR
+	BLE			regreso2
+	VADD.F32	S20,S20,S4
+	B			div2
+	
+div3
+	VMUL.F32	S9,S20,S0
+	VSUB.F32	S10,S3,S9
+	VCMP.F32	S10,S0
+	VMRS APSR_nzcv,FPSCR
+	BLE			regreso3
+	VADD.F32	S20,S20,S4
+	B			div3
+	
+regreso1
+	BX	LR
+	
+regreso2
+	BX	LR
+
+regreso3
+	BX	LR
+	
+exacto1
+	B	segundo
+exacto2
+	B	tercero
+exacto3
+	B	orden2
+	
+orden2
+	VSUB.F32	S9,S6,S7
+	VABS.F32	S10,S9
+	VDIV.F32	S11,S9,S10
+	VCMP.F32	S11,S4
+	VMRS APSR_nzcv,FPSCR
+	BEQ.W			mayor11
+	
+	VSUB.F32	S9,S7,S8
+	VABS.F32	S10,S9
+	VDIV.F32	S11,S9,S10
+	VCMP.F32	S11,S4
+	VMRS APSR_nzcv,FPSCR
+	BEQ.W			mayor12
+	B				mcm2
+	
+mayor11	
+	VMOV.F32	S12,S6
+	VMOV.F32	S13,S7
+	VMOV.F32	S6,S13
+	VMOV.F32	S7,S12
+	B	orden2
+	
+mayor12	
+	VMOV.F32	S12,S7
+	VMOV.F32	S13,S8
+	VMOV.F32	S7,S13
+	VMOV.F32	S8,S12
+	B	orden2
+	
+mcm2
+	VDIV.F32	S9,S6,S6
+	VDIV.F32	S10,S7,S6
+	VDIV.F32	S11,S8,S6
+	VLDR.F32	S20,=1
+primero1
+	BL			div11
+	VADD.F32	S20,S20,S4
+	VCMP.F32	S20,S10
+	VMRS APSR_nzcv,FPSCR
+	BEQ			exacto11
+	VMOV.F32	S10,S7
+segundo1
+	BL			div21
+	VADD.F32	S20,S20,S4
+	VCMP.F32	S20,S11
+	VMRS APSR_nzcv,FPSCR
+	BEQ			exacto21
+	VMOV.F32	S11,S8
+	B			orden3
+	
+div11
+	VMUL.F32	S12,S20,S6
+	VSUB.F32	S13,S7,S12
+	VCMP.F32	S13,S6
+	VMRS APSR_nzcv,FPSCR
+	BLE			regreso11
+	VADD.F32	S20,S20,S4
+	B			div11
+	
+div21
+	VMUL.F32	S12,S20,S6
+	VSUB.F32	S13,S8,S12
+	VCMP.F32	S13,S6
+	VMRS APSR_nzcv,FPSCR
+	BLE			regreso21
+	VADD.F32	S20,S20,S4
+	B			div21
+	
+regreso11
+	BX			LR
+	
+regreso21
+	BX			LR
+	
+exacto11
+	B	segundo1
+exacto21
+	B	orden3
+
+orden3
+	VSUB.F32	S12,S10,S11
+	VABS.F32	S13,S12
+	VDIV.F32	S14,S12,S13
+	VCMP.F32	S14,S4
+	VMRS APSR_nzcv,FPSCR
+	BEQ.W			mayor21
+	B				mcm3
+mayor21
+	VMOV.F32	S15,S10
+	VMOV.F32	S16,S11
+	VMOV.F32	S10,S16
+	VMOV.F32	S11,S15
+	B			orden3
+
+mcm3
+	VDIV.F32	S12,S10,S10
+	VDIV.F32	S13,S11,S10
+	VLDR.F32	S20,=1
+primero31
+	BL			div31
+	VADD.F32	S20,S20,S4
+	VCMP.F32	S20,S13
+	VMRS APSR_nzcv,FPSCR
+	BEQ			exacto31
+	VMOV.F32	S13,S11	
+	
+div31
+	VMUL.F32	S14,S20,S10
+	VSUB.F32	S15,S13,S14
+	VCMP.F32	S15,S6
+	VMRS APSR_nzcv,FPSCR
+	BLE			regreso31
+	VADD.F32	S20,S20,S4
+	B			div31
+	
+regreso31
+	BX			LR
+	
+exacto31
+	B	calculo
+	
+calculo
+	VMUL.F32	S25,S0,S6
+	VMUL.F32	S25,S25,S10
+	VMUL.F32	S25,S25,S13
+	B			Loop
+	
+Loop
+	
+	B	Loop
+
+	ALIGN
+	END

@@ -1,0 +1,30 @@
+		AREA	|.text|, CODE, READONLY, ALIGN=2
+		THUMB
+		EXPORT Start
+	
+Start
+	VLDR.F32 S0,=1
+	VLDR.F32 S1,=9
+	VLDR.F32 S2,=0
+
+Factorial1
+	VMUL.F32 S3,S1,S0
+	B Factorial
+
+Factorial
+	VSUB.F32 S1,S1,S0
+	VMUL.F32 S3,S3,S1
+	VCMP.F32 S1,S0
+	VMRS APSR_nzcv,FPSCR
+	BEQ FINAL1	
+	B Factorial
+
+FINAL1
+	VMUL.F32 S3,S3,S0
+	B Loop
+	
+Loop
+	B Loop
+			
+	ALIGN
+	END
